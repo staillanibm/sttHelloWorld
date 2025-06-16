@@ -1,0 +1,10 @@
+services:
+  msr:
+    container_name: msr
+    image: stt-hello-world
+    ports:
+      - "15555:5555"
+    env_file:
+      - .env
+    volumes:
+      - ./application.properties:/opt/softwareag/IntegrationServer/application.properties

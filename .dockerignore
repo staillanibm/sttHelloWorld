@@ -1,0 +1,5 @@
+application.properties
+.env
+Dockerfile
+docker-compose.yml
+*.md

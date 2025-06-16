@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stt-hello-world
+data:
+  application.properties: |
+    user.Administrator.password=$secret{ADMIN_PASSWORD}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: stt-hello-world
+  name: stt-hello-world
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: stt-hello-world
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: stt-hello-world
+    spec:
+      containers:
+        - image: ghcr.io/staillanibm/stt-hello-world
+          name: msr
+          volumeMounts:
+            - name: application-properties
+              mountPath: /opt/softwareag/IntegrationServer/application.properties
+              subPath:   application.properties
+              readOnly:  true
+            - name: secrets
+              mountPath: /etc/secrets
+          readinessProbe:
+            tcpSocket:
+              port: 5555
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 18
+          livenessProbe:
+            tcpSocket:
+              port: 5555
+            failureThreshold: 3
+            initialDelaySeconds: 120
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 300m
+              memory: 500Mi
+            limits:
+              cpu: 1000m
+              memory: 1000Mi
+      volumes:
+        - name: application-properties
+          configMap:
+            name: stt-hello-world
+            items:
+            - key:  application.properties
+              path: application.properties
+        - name: secrets
+          secret:
+            secretName: stt-hello-world
+      imagePullSecrets:
+        - name: regcred
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: stt-hello-world
+  labels:
+    name: stt-hello-world
+    app: stt-hello-world
+spec:
+  selector:
+    app: stt-hello-world
+  type: LoadBalancer
+  ports:
+  - port: 5555
+    targetPort: 5555
+    name: http
