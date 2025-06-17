@@ -1,31 +1,45 @@
-# webMethods Integration Microservice: Hello World
+# webMethods Integration Microservice: Hello World - JDBC
 
-Very simple webMethods integration microservice which showcases the build, configuration and deployment of an integration package that contains a hello world API.
+TODO
 
 ##  Development
 
-The integration package was implemented using the webMethods service designer and pushed to Github using the embedded Git client, which is available through the "Local Service Development" feature.  
-A full fledged Service Designer (with the webMethods Microservices Runtime) can be downloaded here: https://www.ibm.com/resources/mrs/assets?source=WMS_Designers  
+The initial sttHelloWorld package is enhanced with a new POST /messages API methods, which accepts a message. The message in question is saved in a Postgres database using the JDBC Adapter, along with a few other properties:
+-   a uuid, allocated by the server to identify the message, which is also returned in the API response
+-   the current timestamp
+-   the name of the creator, which is populated from a microservices runtime global variable
   
+The implementation pushed to this Github repo isn't state of the art. The goal is to show how to deal with JDBC connectivity the cloud-native way.  
+It references a JDBC adapter connection named postgres.  
+The DDL of the Postgres messages table can be found in ./resources/database  
+
 To test the API using curl:
 ```
-curl -u Administrator:manage "http://localhost:5555/hello-world/greetings?name=Designer" -H "Accept: application/json"
+curl -X POST "http://localhost:5555/hello-world/messages" -u Administrator:manage -H "Accept: application/json" -H "Content-Type: application/json" -d '{"content":"Hello from Designer"}'
 ```
   
-Which should return:
-```
-{"message":"Hello Designer","dateTime":"2025-06-16T13:50:34.298Z"}
-```
+Which should the uuid of the inserted message (allocated by the server.)
+
 
 ##  Image build
 
 A Dockerfile is provided to build the image:
 -   it uses an official webMethods Microservices Runtime base image
--   it copies the sttHelloWorld package into /opt/softwareag/IntegrationServer/packages
+-   it takes the webMethods Package Manager (WPM) token in argument (go to https://packages.webmethods.io to create such a token if you don't already have one)
+-   it uses this token to install the WmJDBCAdapter packages from packages.webmethods.io
+-   then it downloads the Postgres JDBC driver and places in a relevant location
+-   finally, it copies the sttHelloWorld package into /opt/softwareag/IntegrationServer/packages
 
-To perform the build and create an image with the stt-hello-world tag name:
+Important: the management of the WPM token described in this Dockerfile isn't leak proof. There are better ways of dealing with it (staged build, build secrets), but at this stage I want to keep things simple.  
+  
+Pre-requisite: you need to login to the IBM image registry to pull the base product image. The username is "cp" and the password is a token that needs to be obtained from https://myibm.ibm.com
 ```
-docker build -t stt-hello-world --platform=linux/amd64 .
+docker login cp.icr.io -u cp
+```
+  
+To perform the build and create an image with the stt-hello-world-jdbc tag name (don't forget to set the WPM_TOKEN environment variable):
+```
+docker build -t stt-hello-world-jdbc --platform=linux/amd64 --build-arg WPM_TOKEN=${WPM_TOKEN} .
 ```
   
 We'll push this image to a remote image registry a little later.  
@@ -36,16 +50,25 @@ We build the image once and then deploy it in all its target environments.
 The image configuration is externalized in an application.properties file that is managed in a "configuration as code" approach and injected into the container upon startup.  
 This application.properties file references environment variables, Kubernetes secrets or vault secrets.  
 
+We have properties to:
+-   configure the Administrator password: user.Administrator.password
+-   configure the JDBC adapter connection: artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.*
+-   set the value of the SERVER global variable: globalvariable.SERVER.value
+  
 ##  Local deployment using docker compose
 
 The ./resources/compose folder contains resources to deploy a container using compose. We have:
--   the application.properties file, which sets the Administrator password and references an ADMIN_PASSWORD environment variable
--   the value for this environment variable is set in a .env file (ADMIN_PASSWORD is set to Manage123 here)
+-   the application.properties file, which
+    -   sets the Administrator password by referencing an ADMIN_PASSWORD environment variable
+    -   sets the JDBC adapter connection parameters, referencing the DB_USERNAME and DB_PASSWORD environment variables. We make this connection point to a Postgres database deployed in the same docker compose stack.
+    -   sets the value of the SERVER global variable to DOCKER
+-   the .env file which sets values for the environment variables referenced by the application.properties file
 -   the docker-compose.yml file which 
     -   creates a container from the stt-hello-world image,
     -   mounts the application.properties at the correct location, 
     -   injects the variables defined in .env,
     -   maps the internal 5555 port to the external 15555 port (meaning we can access the microservice via http://localhost:15555)
+    -   also creates a Postgres container and creates a user using the DB_USERNAME and DB_PASSWORD environment variables
   
 To start the compose stack:
 ```
@@ -57,15 +80,15 @@ To check the microservice logs:
 docker logs -f msr
 ```
 
+Before performing an API call for the first time you need to create the database table using the messages.ddl.sql file located in ./resources/database  
+
 To test the API using curl:
 ```
-curl -u Administrator:Manage123 "http://localhost:15555/hello-world/greetings?name=Compose" -H "Accept: application/json"
+curl -X POST "http://localhost:15555/hello-world/messages" -u Administrator:Manage123 -H "Accept: application/json" -H "Content-Type: application/json" -d '{"content":"Hello from Compose"}'
 ```
   
-Which should return:
-```
-{"message":"Hello Compose","dateTime":"2025-06-16T13:53:36.175Z"}
-```
+Which should the uuid of the inserted message (allocated by the server.)  
+
   
 To stop the compose stack:
 ```
@@ -83,21 +106,23 @@ docker login ghcr.io
 
 Tagging of the image (my user name is staillanibm):
 ```
-docker tag stt-hello-world ghcr.io/staillanibm/stt-hello-world 
+docker tag stt-hello-world ghcr.io/staillanibm/stt-hello-world-jdbc
 ```
 
 Push of the image:
 ```
-docker push ghcr.io/staillanibm/stt-hello-world
+docker push ghcr.io/staillanibm/stt-hello-world-jdbc
 ```
   
 ##  Deployment in Kubernetes
 
 The ./resources/kubernetes folder contains resources to create a deployment in Kubernetes. We have:
--   the secret.yml file which references the ADMIN_PASSWORD value, encoded in base64 (value is set to Manage12345 here)
+-   the secret.yml file which references:
+    -   the ADMIN_PASSWORD value, encoded in base64 (value is set to Manage12345 here)
+    -   the DB_USERNAME and DB_PASSWORD values, also encoded in base64
 -   the deploy.yml file which references several objects:
-    -   a config map, which contains the content of the application.properties file (this time user.Administrator.password points to a secret named ADMIN_PASSWORD)
-    -   a deployment with 3 pods, pointing to the container image previously pushed, in which we mount the config map and the secret previously mentioned
+    -   a config map, which contains the content of the application.properties file (to configure the Administrator password, the database connection and the value of the SERVER global variable)
+    -   a deployment with 3 pods, pointing to the container image previously pushed, in which we mount the config map and the secret previously mentioned. We also inject the pod name into the SERVER environment variable
     -   a load balancer service that exposes the 5555 port
 
 The network exposition is simplified here with the use of a load balancer service. At target an ingress should be configured.  
@@ -105,7 +130,7 @@ The network exposition is simplified here with the use of a load balancer servic
 To manage the deployment, follow these steps.
 Note: you can also create a kubernetes namespace to do this deployment, here I am working in the default namespace to keep things simple.  
 
-Create an image registry secret in order for Kubernetes to be able to fetch the image you previously pushed (after setting the references environment variables):
+If not already done, create an image registry secret in order for Kubernetes to be able to fetch the image you previously pushed (after setting the references environment variables):
 ```
 kubectl create secret docker-registry regcred --docker-server=${CR_SERVER} --docker-username=${CR_USERNAME} --docker-password=${CR_PASSWORD}
 ```
@@ -143,13 +168,11 @@ stt-hello-world   LoadBalancer   10.100.228.57   127.0.0.1     5555:31228/TCP   
   
 Finally you can call the API
 ```
-curl -u Administrator:Manage12345 "http://127.0.0.1:5555/hello-world/greetings?name=Kubernetes" -H "Accept: application/json"
+curl -X POST "http://127.0.0.1:5555/hello-world/messages" -u Administrator:Manage12345 -H "Accept: application/json" -H "Content-Type: application/json" -d '{"content":"Hello from Kubernetes"}'
 ```
   
-Which should return:
-```
-{"message":"Hello Kubernetes","dateTime":"2025-06-16T13:59:09.723Z"}
-```
+Which should the uuid of the inserted message (allocated by the server.)  
+
   
 To undeploy:
 ```

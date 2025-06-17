@@ -6,6 +6,16 @@ data:
   application.properties: |
     user.Administrator.password=$secret{ADMIN_PASSWORD}
 
+    artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionEnabled=true
+    artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionSettings.serverName=pg-sttlab-stephane-2316.g.aivencloud.com
+    artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionSettings.portNumber=16934
+    artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionSettings.user=$secret{DB_USERNAME}
+    artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionSettings.password=$secret{DB_PASSWORD}
+    artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionSettings.databaseName=defaultdb
+    artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionSettings.otherProperties=sslmode=require
+
+    globalvariable.SERVER.value=$env{SERVER}
+
 ---
 
 apiVersion: apps/v1
@@ -30,7 +40,7 @@ spec:
         app: stt-hello-world
     spec:
       containers:
-        - image: ghcr.io/staillanibm/stt-hello-world
+        - image: ghcr.io/staillanibm/stt-hello-world-jdbc
           name: msr
           volumeMounts:
             - name: application-properties
@@ -60,6 +70,11 @@ spec:
             limits:
               cpu: 1000m
               memory: 1000Mi
+          env:
+            - name: SERVER
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
       volumes:
         - name: application-properties
           configMap:
