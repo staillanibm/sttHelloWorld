@@ -1,15 +1,15 @@
 # webMethods Integration Microservice: Hello World - JDBC
 
+##  Design
+
 TODO
 
 ##  Development
 
-The initial sttHelloWorld package is enhanced with a new POST /messages API methods, which accepts a message. The message in question is saved in a Postgres database using the JDBC Adapter, along with a few other properties:
--   a uuid, allocated by the server to identify the message, which is also returned in the API response
--   the current timestamp
--   the name of the creator, which is populated from a microservices runtime global variable
+The sttHelloWorld package is implemented using the Service Designer that is available at this URL: https://www.ibm.com/resources/mrs/assets?source=WMS_Designers  
+This bundle contains a Microservices Runtime equipped with the wM JDBC Adapter, wM flat file, wM Streaming (for Kafka connectivity) and the Unit Test framework.  
   
-The implementation pushed to this Github repo isn't state of the art. The goal is to show how to deal with JDBC connectivity the cloud-native way.  
+The implementation pushed to this Github repo isn't state of the art. The goal is to show how to deal with webMethods microservice build, configuration and deployment the cloud-native way.  
 It references a JDBC adapter connection named postgres.  
 The DDL of the Postgres messages table can be found in ./resources/database  
 
@@ -18,7 +18,7 @@ To test the API using curl:
 curl -X POST "http://localhost:5555/hello-world/messages" -u Administrator:manage -H "Accept: application/json" -H "Content-Type: application/json" -d '{"content":"Hello from Designer"}'
 ```
   
-Which should the uuid of the inserted message (allocated by the server.)
+Which should return the uuid of the inserted message (allocated by the server.)
 
 
 ##  Image build
@@ -39,7 +39,7 @@ docker login cp.icr.io -u cp
   
 To perform the build and create an image with the stt-hello-world-jdbc tag name (don't forget to set the WPM_TOKEN environment variable):
 ```
-docker build -t stt-hello-world-jdbc --platform=linux/amd64 --build-arg WPM_TOKEN=${WPM_TOKEN} .
+docker build -t stt-hello-world --platform=linux/amd64 --build-arg WPM_TOKEN=${WPM_TOKEN} .
 ```
   
 We'll push this image to a remote image registry a little later.  
@@ -53,6 +53,7 @@ This application.properties file references environment variables, Kubernetes se
 We have properties to:
 -   configure the Administrator password: user.Administrator.password
 -   configure the JDBC adapter connection: artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.*
+-   configure the JDNI and JMS properties to connect to Universal Messaging
 -   set the value of the SERVER global variable: globalvariable.SERVER.value
   
 ##  Local deployment using docker compose
@@ -63,12 +64,10 @@ The ./resources/compose folder contains resources to deploy a container using co
     -   sets the JDBC adapter connection parameters, referencing the DB_USERNAME and DB_PASSWORD environment variables. We make this connection point to a Postgres database deployed in the same docker compose stack.
     -   sets the value of the SERVER global variable to DOCKER
 -   the .env file which sets values for the environment variables referenced by the application.properties file
--   the docker-compose.yml file which 
-    -   creates a container from the stt-hello-world image,
-    -   mounts the application.properties at the correct location, 
-    -   injects the variables defined in .env,
-    -   maps the internal 5555 port to the external 15555 port (meaning we can access the microservice via http://localhost:15555)
-    -   also creates a Postgres container and creates a user using the DB_USERNAME and DB_PASSWORD environment variables
+-   the docker-compose.yml file with: 
+    -   a container created from the stt-hello-world image
+    -   a Postgres container which configures a user using the DB_USERNAME and DB_PASSWORD environment variables
+    -   a Universal Messaging container
   
 To start the compose stack:
 ```
@@ -84,7 +83,7 @@ Before performing an API call for the first time you need to create the database
 
 To test the API using curl:
 ```
-curl -X POST "http://localhost:15555/hello-world/messages" -u Administrator:Manage123 -H "Accept: application/json" -H "Content-Type: application/json" -d '{"content":"Hello from Compose"}'
+curl -X POST "http://localhost:15555/hello-world/messages/jms" -u Administrator:Manage123 -H "Accept: application/json" -H "Content-Type: application/json" -d '{"content":"Hello from Compose"}'
 ```
   
 Which should the uuid of the inserted message (allocated by the server.)  

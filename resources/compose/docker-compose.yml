@@ -1,7 +1,7 @@
 services:
   msr:
     container_name: msr
-    image: stt-hello-world-jdbc
+    image: stt-hello-world-jms
     ports:
       - "15555:5555"
     env_file:
@@ -10,6 +10,8 @@ services:
       - ./application.properties:/opt/softwareag/IntegrationServer/application.properties
     depends_on:
       postgres:
+        condition: service_healthy
+      umserver:
         condition: service_healthy
 
   postgres:
@@ -30,5 +32,17 @@ services:
       retries: 5
       start_period: 10s
 
+  umserver:
+    image: cp.icr.io/cp/webmethods/universalmessaging/universalmessaging-server:11.1.1
+    volumes:
+      - um-data-volume:/opt/softwareag/UniversalMessaging/server/umserver/data
+      - um-conf-volume:/opt/softwareag/common/conf
+    healthcheck:
+      interval: 5s
+      retries: 12
+      test: ["CMD-SHELL", "curl --silent http://localhost:9000/health/ | grep -q '\"ServerStatus\":\"OK\"'"]
+
 volumes:
   postgres-data:
+  um-data-volume:
+  um-conf-volume:

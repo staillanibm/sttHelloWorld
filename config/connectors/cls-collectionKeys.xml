@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<services>
+    <cloudstreamsCollectionKeys serviceName="WmCloudStreams.RestVS">
+        <servicesKeys>
+            <keyDetails collectionKey="sttHelloWorld.eu.sttlab.services.s3:readFile" connectorServiceName="sttHelloWorld.eu.sttlab.services.s3:readFile"/>
+        </servicesKeys>
+    </cloudstreamsCollectionKeys>
+</services>

@@ -14,6 +14,16 @@ data:
     artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionSettings.databaseName=defaultdb
     artConnection.sttHelloWorld.sttHelloWorld.eu.sttlab.connections.postgres.connectionSettings.otherProperties=sslmode=require
 
+    jndi.DEFAULT_IS_JNDI_PROVIDER.providerURL=nsp://umserver-0:9000
+    jms.DEFAULT_IS_JMS_CONNECTION.clientID=DEFAULT_IS_JMS_CLIENT
+    jms.DEFAULT_IS_JMS_CONNECTION.enabled=true
+    jms.DEFAULT_IS_JMS_CONNECTION.csqSize=0
+    jms.DEFAULT_IS_JMS_CONNECTION.jndi_jndiAliasName=DEFAULT_IS_JNDI_PROVIDER
+    jms.DEFAULT_IS_JMS_CONNECTION.jndi_automaticallyCreateUMAdminObjects=true
+    jms.DEFAULT_IS_JMS_CONNECTION.producerMaxRetryAttempts=30
+    jms.DEFAULT_IS_JMS_CONNECTION.producerRetryInterval=1000
+    jms.DEFAULT_IS_JMS_CONNECTION.jndi_connectionFactoryLookupName=kubernetes_um
+
     globalvariable.SERVER.value=$env{SERVER}
 
 ---
@@ -100,8 +110,30 @@ metadata:
 spec:
   selector:
     app: stt-hello-world
-  type: LoadBalancer
+  type: ClusterIP
+  sessionAffinity: ClientIP
   ports:
   - port: 5555
     targetPort: 5555
     name: http
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: stt-hello-world
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: msr-helloworld.local      
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: stt-hello-world
+            port:
+              number: 5555
