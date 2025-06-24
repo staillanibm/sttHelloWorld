@@ -2791,6 +2791,7 @@
   <null name="originURI"/>
   <value name="modifiable">true</value>
   <value name="is_public">false</value>
+  <value name="is_visible">true</value>
   <value name="node_type">service</value>
   <value name="cloudNodeVersion">1</value>
   <record name="cloudNodeProperties" javaclass="com.wm.util.Values">
