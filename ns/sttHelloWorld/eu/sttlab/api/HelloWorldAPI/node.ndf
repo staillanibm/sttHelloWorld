@@ -750,6 +750,46 @@
         </record>
       </record>
     </record>
+    <record name="/users/send" javaclass="com.wm.util.Values">
+      <value name="nsName">sttHelloWorld.eu.sttlab.api:HelloWorldResource</value>
+      <value name="path">/users/send</value>
+      <null name="suffix"/>
+      <record name="operations" javaclass="com.wm.util.Values">
+        <record name="POST" javaclass="com.wm.util.Values">
+          <value name="operationType">POST</value>
+          <value name="nsName">/users/send_POST</value>
+          <array name="consumes" type="value" depth="1">
+            <value>application/x-www-form-urlencoded</value>
+          </array>
+          <record name="parameters" javaclass="com.wm.util.Values">
+            <record name="filename" javaclass="com.wm.util.Values">
+              <value name="name">filename</value>
+              <value name="source">FORMDATA</value>
+              <value name="type">STRING</value>
+              <null name="description"/>
+              <Boolean name="isRequired">true</Boolean>
+              <Boolean name="isArray">false</Boolean>
+              <null name="defaultValue"/>
+              <null name="refDefinition"/>
+              <null name="definitionName"/>
+              <Boolean name="includeInRad">true</Boolean>
+            </record>
+          </record>
+          <record name="responses" javaclass="com.wm.util.Values">
+            <record name="200" javaclass="com.wm.util.Values">
+              <value name="statusCode">200</value>
+              <value name="description">OK</value>
+              <Boolean name="returnOutput">true</Boolean>
+            </record>
+            <record name="401" javaclass="com.wm.util.Values">
+              <value name="statusCode">401</value>
+              <value name="description">Access Denied</value>
+              <Boolean name="returnOutput">false</Boolean>
+            </record>
+          </record>
+        </record>
+      </record>
+    </record>
   </record>
   <Boolean name="matchRequestResponsePayloadWithRad">true</Boolean>
   <null name="radSource"/>
