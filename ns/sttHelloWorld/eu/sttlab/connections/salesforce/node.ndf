@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Values version="2.0">
+  <value name="node_type">CloudConnectionNode</value>
+  <value name="node_subtype">unknown</value>
+  <value name="node_nsName">sttHelloWorld.eu.sttlab.connections:salesforce</value>
+  <value name="node_pkg">sttHelloWorld</value>
+  <value name="is_public">false</value>
+  <value name="cloudNodeVersion">1</value>
+  <record name="cloudNodeProperties" javaclass="com.wm.util.Values">
+    <number name="connectionNodeVersion" type="Integer">1</number>
+    <value name="connectorID">com.softwareag.cloudstreams.salesforce.rest_v60</value>
+    <value name="providerName">WmSalesforceRESTProvider</value>
+    <value name="providerConnectionType">sagcloud</value>
+    <record name="connectionGroupProperties" javaclass="com.wm.util.Values">
+      <value name="cn.providerUrl">https://orgfarm-94e92d9500-dev-ed.develop.my.salesforce.com</value>
+      <value name="cn.connectTimeout">30000</value>
+      <value name="cn.readTimeout">30000</value>
+      <value name="cn.socketStaleCheck">true</value>
+      <value name="cn.validateAfterInactivity">1000</value>
+      <value name="cn.retryCount">4</value>
+      <value name="cn.retryIfRequestSentOk">true</value>
+      <value name="cn.tcpNoDelay">false</value>
+      <value name="cn.socketLinger">-1</value>
+      <value name="cn.sockBuffSize">8192</value>
+      <value name="cn.reuseAddr">false</value>
+      <value name="cn.webproxyAlias"></value>
+      <value name="cn.truststoreAlias"></value>
+      <value name="cn.keystoreAlias"></value>
+      <value name="cn.clientKeyAlias"></value>
+      <value name="cn.hostnameVerifier">org.apache.http.conn.ssl.DefaultHostnameVerifier</value>
+      <value name="cn.keepAliveInterval">300000</value>
+      <value name="cn.idleTimeout">-1</value>
+      <value name="cn.enableCompression">false</value>
+      <value name="cn.enableSNI">true</value>
+      <value name="cn.sniServerName"></value>
+      <value name="oauth.consumerId">3MVG9dAEux2v1sLuFxnd1N_bXrRevKDz6OBgc4fIbBNTZ6iFStgrz62wNis2FflozuJIDrpZAhz6OaSHlJLLR</value>
+      <value name="oauth.consumerSecret">sttHelloWorld.eu.sttlab.connections:salesforce.oauth.consumerSecret</value>
+      <value name="oauth.accessToken">sttHelloWorld.eu.sttlab.connections:salesforce.oauth.accessToken</value>
+      <value name="oauth_v20.authorizationServerUrl">https://login.salesforce.com/services/oauth2/authorize</value>
+      <value name="oauth_v20.authenticationServerUrl">https://login.salesforce.com/services/oauth2/token</value>
+      <value name="oauth_v20.instanceURL">https://orgfarm-94e92d9500-dev-ed.develop.my.salesforce.com</value>
+      <value name="oauth_v20.refreshAccessToken">true</value>
+      <value name="oauth_v20.refreshToken">sttHelloWorld.eu.sttlab.connections:salesforce.oauth_v20.refreshToken</value>
+      <value name="oauth_v20.accessTokenRefreshURL">https://login.salesforce.com/services/oauth2/token</value>
+      <value name="oauth_v20.accessTokenRefreshURLRequest">URL Query String</value>
+      <value name="oauth_v20.accessTokenRefreshCustomESBService"></value>
+      <value name="oauth_v20.authorizationHeaderPrefix">Bearer</value>
+      <value name="oauth_v20.scope">offline_access api refresh_token</value>
+      <value name="cx.grant_type">refresh_token</value>
+    </record>
+    <array name="passmanHandles" type="value" depth="1">
+      <value>sttHelloWorld.eu.sttlab.connections:salesforce.oauth.consumerSecret</value>
+      <value>sttHelloWorld.eu.sttlab.connections:salesforce.oauth.accessToken</value>
+      <value>sttHelloWorld.eu.sttlab.connections:salesforce.oauth_v20.refreshToken</value>
+    </array>
+    <record name="connectionManagerProperties" javaclass="com.wm.util.Values">
+      <value name="poolable">true</value>
+      <value name="minimumPoolSize">1</value>
+      <value name="maximumPoolSize">10</value>
+      <value name="poolIncrementSize">1</value>
+      <value name="blockTimeout">1000</value>
+      <value name="expireTimeout">1000</value>
+      <value name="startupRetryCount">0</value>
+      <value name="startupBackoffSecs">10</value>
+      <value name="timeoutType">auto</value>
+      <value name="sessionExpiry">0</value>
+    </record>
+    <array name="formattableFields" type="value" depth="1">
+    </array>
+    <value name="connectionEnabled">true</value>
+  </record>
+</Values>
