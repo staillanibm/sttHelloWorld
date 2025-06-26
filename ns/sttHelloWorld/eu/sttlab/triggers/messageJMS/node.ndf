@@ -55,9 +55,11 @@
     </array>
     <array name="destinations" type="record" depth="1">
       <record javaclass="com.wm.util.Values">
-        <value name="destination">helloworld_queue</value>
+        <value name="destination">helloworld_topic</value>
         <null name="messageSelector"/>
-        <number name="destinationType" type="Integer">0</number>
+        <number name="destinationType" type="Integer">1</number>
+        <null name="durableSubscriberName"/>
+        <Boolean name="durableSubscriberNoLocal">false</Boolean>
       </record>
     </array>
   </record>
