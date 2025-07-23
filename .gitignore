@@ -1,1 +1,3 @@
 *.bak
+config/*.dat
+config/passman.cnf

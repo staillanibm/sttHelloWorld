@@ -3,31 +3,6 @@
 <IDataXMLCoder version="1.0">
   <record javaclass="com.wm.data.ISMemDataImpl">
     <array name="globalVariables" type="record" depth="1">
-      <record javaclass="com.wm.data.ISMemDataImpl">
-        <value name="key">SERVER</value>
-        <value name="value">LOCAL</value>
-        <value name="isSecure">false</value>
-      </record>
-      <record javaclass="com.wm.data.ISMemDataImpl">
-        <value name="key">SFTP_SERVER_HOST</value>
-        <value name="value">presalesemeadev.mft-aw-de.webmethods.io</value>
-        <value name="isSecure">false</value>
-      </record>
-      <record javaclass="com.wm.data.ISMemDataImpl">
-        <value name="key">SFTP_SERVER_PORT</value>
-        <value name="value">33022</value>
-        <value name="isSecure">false</value>
-      </record>
-      <record javaclass="com.wm.data.ISMemDataImpl">
-        <value name="key">SFTP_USER_NAME</value>
-        <value name="value">stt</value>
-        <value name="isSecure">false</value>
-      </record>
-      <record javaclass="com.wm.data.ISMemDataImpl">
-        <value name="key">SFTP_PASSWORD</value>
-        <value name="value">gvhandle.SFTP_PASSWORD</value>
-        <value name="isSecure">true</value>
-      </record>
     </array>
   </record>
 </IDataXMLCoder>
