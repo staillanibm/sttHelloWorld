@@ -2,7 +2,6 @@
 <services>
     <cloudstreamsCollectionKeys serviceName="WmCloudStreams.RestVS">
         <servicesKeys>
-            <keyDetails collectionKey="sttHelloWorld.eu.sttlab.services.s3:readFile" connectorServiceName="sttHelloWorld.eu.sttlab.services.s3:readFile"/>
             <keyDetails collectionKey="sttHelloWorld.eu.sttlab.services.salesforce:listAccounts" connectorServiceName="sttHelloWorld.eu.sttlab.services.salesforce:listAccounts"/>
         </servicesKeys>
     </cloudstreamsCollectionKeys>
