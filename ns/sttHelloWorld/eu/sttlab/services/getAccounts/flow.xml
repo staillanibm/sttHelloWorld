@@ -2450,9 +2450,6 @@
 
 <MAPCOPY FROM="/listAccountsOutput;2;0/responseBody;2;0/queryResponse;2;0/records;2;0/CreatedDate;1;0" TO="/accounts;4;0;sttHelloWorld.eu.sttlab.docTypes:Account/creationDateTime;1;0">
 </MAPCOPY>
-
-<MAPCOPY FROM="/listAccountsOutput;2;0/responseBody;2;0/queryResponse;2;0/records;2;0/LastModifiedDate;1;0" TO="/accounts;4;0;sttHelloWorld.eu.sttlab.docTypes:Account/lastUpdateDateTime;1;0">
-</MAPCOPY>
 </MAP>
 </LOOP>
 
